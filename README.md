@@ -1,10 +1,8 @@
 # Ncode v1.0.0
 
-![Ncode Banner](docs/assets/banner.png) <!-- Placeholder for banner image -->
-
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Python Version](https://img.shields.io/badge/Python-3.10+-blue.svg)](https://python.org)
-[![LLaMA Models](https://img.shields.io/badge/LLaMA-Models-green.svg)](https://github.com/facebookresearch/llama)
+![License](https://img.shields.io/static/v1?label=license&message=MIT&color=blue)
+![Python](https://img.shields.io/static/v1?label=python&message=3.10%2B&color=blue)
+![Status](https://img.shields.io/static/v1?label=status&message=active&color=success)
 
 A powerful local code generation system using LLaMA models for planning and implementation.
 
@@ -14,7 +12,6 @@ A powerful local code generation system using LLaMA models for planning and impl
 - [Usage](#usage)
 - [Architecture](#architecture)
 - [Technical Details](#technical-details)
-- [Screenshots](#screenshots)
 - [Contributing](#contributing)
 - [Acknowledgments](#acknowledgments)
 - [License](#license)
@@ -29,16 +26,7 @@ A powerful local code generation system using LLaMA models for planning and impl
 | **Model Flexibility** | Hot-swappable models for planning and coding |
 | **Resource Optimization** | Dynamic context sizing and memory management |
 
-![Feature Diagram](docs/assets/features.png) <!-- Placeholder for feature diagram -->
-
 ## Installation
-
-```mermaid
-graph TD
-    A[Clone Repository] --> B[Install Dependencies]
-    B --> C[Download Models]
-    C --> D[Run Application]
-```
 
 1. Clone the repository:
 ```bash
@@ -51,14 +39,12 @@ cd Ncode
 pip install -r requirements.txt
 ```
 
-3. Download models to the `models/` directory:
-```bash
-# Planning Model
-wget https://example.com/models/mistral-7b-instruct-v0.2.Q4_K_M.gguf -O models/mistral-7b-instruct-v0.2.Q4_K_M.gguf
-
-# Coding Model
-wget https://example.com/models/codellama-7b-instruct.Q4_K_M.gguf -O models/codellama-7b-instruct.Q4_K_M.gguf
-```
+3. Download required models:
+   - Place your planning and coding models in the `models/` directory
+   - Supported formats: GGUF (recommended), GGML
+   - Recommended models:
+     - Planning: Mistral-7B-Instruct or similar instruction-tuned model
+     - Coding: CodeLlama-7B-Instruct or similar code-specialized model
 
 ## Usage
 
@@ -73,7 +59,7 @@ python backend/cli_client.py
 |---------|-------------|
 | `mtp` | Toggle Multi-Token Prediction mode |
 | `models` | List available models |
-| `switch TYPE MODEL` | Change active model (TYPE: planning|coding) |
+| `switch TYPE MODEL` | Change active model (TYPE: planning\|coding) |
 | `help` | Show help message |
 | `quit` | Exit program |
 
@@ -91,11 +77,6 @@ MTP is now enabled
 > create a hello world program in python
 [Single model generates combined solution]
 ```
-
-## Screenshots
-
-![CLI Example](docs/assets/cli_example.png) <!-- Placeholder for CLI screenshot -->
-![Architecture Diagram](docs/assets/architecture.png) <!-- Placeholder for architecture diagram -->
 
 ## Architecture
 
