@@ -64,7 +64,6 @@ Ncode requires two GGUF-quantized models for optimal performance:
 - [CodeLlama-7B-Instruct-Q4_K_M](https://huggingface.co/TheBloke/CodeLlama-7B-Instruct-GGUF/resolve/main/codellama-7b-instruct.Q4_K_M.gguf) (4-bit, 4.24GB, Recommended)
 - [CodeLlama-7B-Instruct-Q5_K_M](https://huggingface.co/TheBloke/CodeLlama-7B-Instruct-GGUF/resolve/main/codellama-7b-instruct.Q5_K_M.gguf) (5-bit, 5.21GB, Higher quality)
 
-##### Option 1: Direct Download
 ```bash
 # Create models directory
 mkdir -p models
@@ -76,22 +75,6 @@ wget https://huggingface.co/TheBloke/Mistral-7B-Instruct-v0.2-GGUF/resolve/main/
 
 # Coding Model
 wget https://huggingface.co/TheBloke/CodeLlama-7B-Instruct-GGUF/resolve/main/codellama-7b-instruct.Q4_K_M.gguf
-
-cd ..
-```
-
-##### Option 2: Using Hugging Face CLI
-```bash
-# Install Hugging Face Hub CLI
-pip install huggingface_hub
-
-# Create models directory
-mkdir -p models
-cd models
-
-# Download models using HF CLI
-huggingface-cli download TheBloke/Mistral-7B-Instruct-v0.2-GGUF mistral-7b-instruct-v0.2.Q4_K_M.gguf
-huggingface-cli download TheBloke/CodeLlama-7B-Instruct-GGUF codellama-7b-instruct.Q4_K_M.gguf
 
 cd ..
 ```
