@@ -53,14 +53,105 @@ pip install -r requirements.txt
 ```
 
 3. Download required models:
+
+Ncode requires two GGUF-quantized models for optimal performance:
+
+#### Planning Model (Choose one)
+- [Mistral-7B-Instruct-v0.2-Q4_K_M](https://huggingface.co/TheBloke/Mistral-7B-Instruct-v0.2-GGUF/resolve/main/mistral-7b-instruct-v0.2.Q4_K_M.gguf) (4-bit, 4.37GB, Recommended)
+- [Mistral-7B-Instruct-v0.2-Q5_K_M](https://huggingface.co/TheBloke/Mistral-7B-Instruct-v0.2-GGUF/resolve/main/mistral-7b-instruct-v0.2.Q5_K_M.gguf) (5-bit, 5.36GB, Higher quality)
+
+#### Coding Model (Choose one)
+- [CodeLlama-7B-Instruct-Q4_K_M](https://huggingface.co/TheBloke/CodeLlama-7B-Instruct-GGUF/resolve/main/codellama-7b-instruct.Q4_K_M.gguf) (4-bit, 4.24GB, Recommended)
+- [CodeLlama-7B-Instruct-Q5_K_M](https://huggingface.co/TheBloke/CodeLlama-7B-Instruct-GGUF/resolve/main/codellama-7b-instruct.Q5_K_M.gguf) (5-bit, 5.21GB, Higher quality)
+
+##### Option 1: Direct Download
 ```bash
 # Create models directory
 mkdir -p models
+cd models
 
-# Download recommended models
-# Planning: Mistral-7B-Instruct
-# Coding: CodeLlama-7B-Instruct
+# Download recommended models (4-bit versions)
+# Planning Model
+wget https://huggingface.co/TheBloke/Mistral-7B-Instruct-v0.2-GGUF/resolve/main/mistral-7b-instruct-v0.2.Q4_K_M.gguf
+
+# Coding Model
+wget https://huggingface.co/TheBloke/CodeLlama-7B-Instruct-GGUF/resolve/main/codellama-7b-instruct.Q4_K_M.gguf
+
+cd ..
 ```
+
+##### Option 2: Using Hugging Face CLI
+```bash
+# Install Hugging Face Hub CLI
+pip install huggingface_hub
+
+# Create models directory
+mkdir -p models
+cd models
+
+# Download models using HF CLI
+huggingface-cli download TheBloke/Mistral-7B-Instruct-v0.2-GGUF mistral-7b-instruct-v0.2.Q4_K_M.gguf
+huggingface-cli download TheBloke/CodeLlama-7B-Instruct-GGUF codellama-7b-instruct.Q4_K_M.gguf
+
+cd ..
+```
+
+**System Requirements:**
+- Disk: ~9GB for both 4-bit models, ~11GB for both 5-bit models
+- RAM: Minimum 16GB recommended
+- GPU: Optional, but recommended for faster generation (8GB VRAM minimum for 4-bit models)
+
+#### Alternative Models
+
+Ncode supports various model configurations:
+
+##### Local GGUF Models
+You can use any GGUF-quantized model that follows instruction format:
+- [Llama-2-7B-Chat](https://huggingface.co/TheBloke/Llama-2-7B-Chat-GGUF)
+- [Neural-Chat-7B](https://huggingface.co/TheBloke/neural-chat-7B-v3-1-GGUF)
+- [Deepseek Coder](https://huggingface.co/TheBloke/deepseek-coder-6.7B-instruct-GGUF)
+- [WizardCoder](https://huggingface.co/TheBloke/WizardCoder-Python-7B-V1.0-GGUF)
+
+Simply download your chosen model and place it in the `models/` directory.
+
+##### API-Based Models
+Ncode also supports API-based models through environment variables:
+
+1. OpenAI API:
+```bash
+# Add to your .env file
+OPENAI_API_KEY=your_api_key
+PLANNING_MODEL=gpt-4
+CODING_MODEL=gpt-4-turbo
+```
+
+2. Anthropic API:
+```bash
+# Add to your .env file
+ANTHROPIC_API_KEY=your_api_key
+PLANNING_MODEL=claude-3-opus
+CODING_MODEL=claude-3-sonnet
+```
+
+3. Custom API Endpoint:
+```bash
+# Add to your .env file
+CUSTOM_API_KEY=your_api_key
+CUSTOM_API_URL=https://your-api-endpoint
+PLANNING_MODEL=your_planning_model
+CODING_MODEL=your_coding_model
+```
+
+To use API models:
+1. Create a `.env` file in the project root
+2. Add your API configuration
+3. Install API dependencies:
+```bash
+pip install python-dotenv openai anthropic
+```
+4. Start Ncode normally - it will automatically detect and use the configured API models
+
+**Note:** When using API models, the system requirements are much lower since models run on the provider's servers.
 
 ## 🚀 Usage
 
