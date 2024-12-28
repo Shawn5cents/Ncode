@@ -1,0 +1,37 @@
+{
+  "versions": [
+    {
+      "name": "mistral-ft-20241226_025654",
+      "base_model": "mistral",
+      "created": "2024-12-26T02:56:54.540859",
+      "training_samples": 1
+    },
+    {
+      "name": "mistral-ft-20241226_030014",
+      "base_model": "mistral",
+      "created": "2024-12-26T03:00:14.529172",
+      "training_samples": 1
+    },
+    {
+      "name": "mistral-ft-20241226_030131",
+      "base_model": "mistral",
+      "created": "2024-12-26T03:01:31.267254",
+      "training_samples": 1
+    },
+    {
+      "name": "mistral-ft-20241226_030846",
+      "base_model": "mistral",
+      "created": "2024-12-26T03:08:46.445801",
+      "training_samples": 1
+    },
+    {
+      "name": "mistral-ft-20241226_031127",
+      "base_model": "mistral",
+      "created": "2024-12-26T03:11:27.103807",
+      "training_samples": 1
+    }
+  ],
+  "current_version": null,
+  "current": "mistral-ft-20241226_031127",
+  "last_updated": "2024-12-26T03:11:27.104804"
+}
