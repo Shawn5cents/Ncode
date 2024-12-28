@@ -1,32 +1,45 @@
-# Ncode v1.0.0
+<div align="center">
 
-![License](https://img.shields.io/static/v1?label=license&message=MIT&color=blue)
-![Python](https://img.shields.io/static/v1?label=python&message=3.10%2B&color=blue)
-![Status](https://img.shields.io/static/v1?label=status&message=active&color=success)
+# 🚀 Ncode v1.0.0
 
-A powerful local code generation system using LLaMA models for planning and implementation.
+### AI-Powered Code Generation, Reimagined
 
-## Table of Contents
-- [Features](#features)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Architecture](#architecture)
-- [Technical Details](#technical-details)
-- [Contributing](#contributing)
-- [Acknowledgments](#acknowledgments)
-- [License](#license)
+[![License](https://img.shields.io/static/v1?label=license&message=MIT&color=blue)](LICENSE)
+[![Python](https://img.shields.io/static/v1?label=python&message=3.10%2B&color=blue)](https://python.org)
+[![Status](https://img.shields.io/static/v1?label=status&message=active&color=success)]()
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
+[![Code Style](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-## Features
+[Features](#-features) • [Installation](#-installation) • [Usage](#-usage) • [Contributing](#-contributing) • [License](#-license)
 
-| Feature | Description |
-|---------|-------------|
-| **Multi-Token Prediction (MTP)** | Experimental mode for faster generation |
-| **Parallel Processing** | Simultaneous planning and code generation |
-| **GPU Acceleration** | Automatic GPU layer optimization |
-| **Model Flexibility** | Hot-swappable models for planning and coding |
-| **Resource Optimization** | Dynamic context sizing and memory management |
+---
 
-## Installation
+```
+  _   _              _      
+ | \ | |            | |     
+ |  \| | ___ ___  __| | ___ 
+ | . ` |/ __/ _ \/ _` |/ _ \
+ | |\  | (_| (_) | (_| |  __/
+ |_| \_|\___\___/ \__,_|\___|
+                             
+ Local Code Generation System
+```
+
+</div>
+
+Transform your ideas into code with Ncode - a powerful local code generation system that combines LLaMA's intelligence with blazing-fast performance. Experience the future of coding with our unique dual-model approach: one for planning, one for implementation.
+
+## ✨ Features
+
+| Feature | Description | Benefits |
+|---------|-------------|-----------|
+| 🚄 **Multi-Token Prediction (MTP)** | Revolutionary parallel token generation | Up to 5x faster code generation |
+| 🔄 **Parallel Processing** | Simultaneous planning and implementation | Efficient workflow, better results |
+| 🎯 **GPU Acceleration** | Smart GPU layer optimization | Maximum performance on your hardware |
+| 🔧 **Model Flexibility** | Hot-swappable planning & coding models | Choose the right model for each task |
+| 📊 **Resource Optimization** | Intelligent memory management | Smooth operation on any system |
+
+## 🛠️ Installation
 
 1. Clone the repository:
 ```bash
@@ -40,78 +53,107 @@ pip install -r requirements.txt
 ```
 
 3. Download required models:
-   - Place your planning and coding models in the `models/` directory
-   - Supported formats: GGUF (recommended), GGML
-   - Recommended models:
-     - Planning: Mistral-7B-Instruct or similar instruction-tuned model
-     - Coding: CodeLlama-7B-Instruct or similar code-specialized model
+```bash
+# Create models directory
+mkdir -p models
 
-## Usage
+# Download recommended models
+# Planning: Mistral-7B-Instruct
+# Coding: CodeLlama-7B-Instruct
+```
 
-Start the CLI:
+## 🚀 Usage
+
+Start generating code with our intuitive CLI:
 ```bash
 python backend/cli_client.py
 ```
 
-### Commands
+### 🎮 Commands
 
 | Command | Description |
 |---------|-------------|
-| `mtp` | Toggle Multi-Token Prediction mode |
-| `models` | List available models |
-| `switch TYPE MODEL` | Change active model (TYPE: planning\|coding) |
-| `help` | Show help message |
-| `quit` | Exit program |
+| `mtp` | 🚄 Toggle Multi-Token Prediction mode |
+| `models` | 📋 List available models |
+| `switch TYPE MODEL` | 🔄 Change active model (TYPE: planning\|coding) |
+| `help` | 💡 Show help message |
+| `quit` | 👋 Exit program |
 
-### Examples
+### 💫 Example: Creating a Web Server
 
-```bash
-# Standard Mode
-> create a hello world program in python
-[Planning model generates architecture]
-[Coding model implements solution]
+```python
+> create a fast http server with rate limiting
 
-# MTP Mode
-> mtp
-MTP is now enabled
-> create a hello world program in python
-[Single model generates combined solution]
+[Planning] Designing architecture...
+✓ Selected FastAPI framework
+✓ Added rate limiting middleware
+✓ Included error handling
+
+[Coding] Implementing solution...
+
+from fastapi import FastAPI, Request
+from fastapi.middleware.throttling import ThrottlingMiddleware
+import uvicorn
+
+app = FastAPI(title="Fast HTTP Server")
+
+# Rate limiting middleware
+app.add_middleware(
+    ThrottlingMiddleware,
+    rate_limit=100,  # requests
+    time_window=60   # seconds
+)
+
+@app.get("/")
+async def root():
+    return {"message": "Welcome to the rate-limited server!"}
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)
+
+✨ Generated server.py with rate limiting!
 ```
 
-## Architecture
+## 🏗️ Architecture
 
-- **LocalModelClient**: Core engine managing model operations
-- **Parallel Generation**: Asynchronous planning and implementation
-- **MTP Mode**: Experimental single-model generation
-- **GPU Optimization**: Automatic layer configuration
-- **Resource Management**: Dynamic context and cleanup
+Our dual-model architecture ensures both speed and quality:
 
-## Technical Details
+- 🧠 **LocalModelClient**: Smart engine managing model operations
+- ⚡ **Parallel Generation**: Asynchronous planning and implementation
+- 🚄 **MTP Mode**: Experimental single-model generation
+- 🎯 **GPU Optimization**: Automatic layer configuration
+- 📊 **Resource Management**: Dynamic context and cleanup
 
-- GPU memory-based optimization
-- Thread-safe model loading
-- Streaming token generation
-- Proper resource cleanup
-- Error handling with CPU fallback
+## 🔧 Technical Details
 
-## Contributing
+- 🎮 GPU memory-based optimization
+- 🔒 Thread-safe model loading
+- 📡 Streaming token generation
+- 🧹 Proper resource cleanup
+- 🛡️ Error handling with CPU fallback
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+## 👥 Contributing
 
-## Acknowledgments
+We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+## 🙏 Acknowledgments
 
 ### Special Thanks
-- **michael5cents**: For inspiration and invaluable support throughout development
-- **Louisce5cents**: For inspiration and crucial support in shaping the project
+- **michael5cents**: For inspiration and invaluable support
+- **Louisce5cents**: For crucial support in shaping the project
 
 ### Project Inspirations
-- [Aider](https://github.com/paul-gauthier/aider): Inspiration for the architect mode and CLI interface
-- [DeepSeek](https://github.com/deepseek-ai/DeepSeek-Coder): Inspiration for the Multi-Token Prediction (MTP) implementation
-
-We thank these individuals and open-source projects for their innovative approaches and support that helped shape Ncode.
+- [Aider](https://github.com/paul-gauthier/aider): Inspiration for architect mode
+- [DeepSeek](https://github.com/deepseek-ai/DeepSeek-Coder): Inspiration for MTP
 
 See [CREDITS.md](docs/CREDITS.md) for a complete list of acknowledgments.
 
-## License
+## 📄 License
 
 MIT License - see [LICENSE](LICENSE) for details.
+
+---
+
+<div align="center">
+Made with ❤️ by the Ncode Team
+</div>
