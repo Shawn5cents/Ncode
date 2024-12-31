@@ -27,6 +27,30 @@
 
 </div>
 
+## 🎯 Project Goals
+
+Ncode aims to revolutionize local code generation by providing:
+- **Efficient Code Generation**: Fast and accurate code suggestions
+- **Local Execution**: Privacy-focused, runs entirely on your machine
+- **Flexible Architecture**: Supports multiple models and configurations
+- **Developer Productivity**: Streamlines coding workflows
+
+## 🧠 Technical Stack
+
+### Core Components
+- **Python 3.10+**: Primary programming language
+- **LLaMA Models**: Base models for code generation
+- **FastAPI**: Web interface and API endpoints
+- **PyTorch**: Model inference and GPU acceleration
+- **Pydantic**: Data validation and settings management
+
+### Key Libraries
+- **Transformers**: Model loading and inference
+- **NumPy**: Numerical computations
+- **Pandas**: Data processing and analysis
+- **Loguru**: Advanced logging capabilities
+- **Pytest**: Comprehensive testing framework
+
 ## 🚀 What's New in v2.0.0
 
 ### Major Enhancements
