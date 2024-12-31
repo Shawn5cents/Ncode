@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="800" height="400" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .code { font-family: monospace; font-size: 14px; }
+    .output { fill: #4CAF50; }
+    .prompt { fill: #2196F3; }
+    .command { fill: #FFF; }
+  </style>
+  <rect width="100%" height="100%" fill="#1E1E1E"/>
+  <text x="10" y="30" class="code prompt">User Prompt:</text>
+  <text x="10" y="60" class="code command">Create a Python function that calculates the Fibonacci sequence up to n terms</text>
+  
+  <text x="10" y="100" class="code prompt">Generated Code:</text>
+  <text x="10" y="130" class="code output">def fibonacci(n):</text>
+  <text x="10" y="150" class="code output">    if n &lt;= 0:</text>
+  <text x="10" y="170" class="code output">        print("Invalid input. Please enter a positive integer.")</text>
+  <text x="10" y="190" class="code output">        return None</text>
+  <text x="10" y="210" class="code output">    elif n == 1 or n == 2:</text>
+  <text x="10" y="230" class="code output">        return [0, 1]</text>
+  <text x="10" y="250" class="code output">    else:</text>
+  <text x="10" y="270" class="code output">        fib_sequence = [0, 1]</text>
+  <text x="10" y="290" class="code output">        for i in range(2, n):</text>
+  <text x="10" y="310" class="code output">            fib_sequence.append(fib_sequence[i-1] + fib_sequence[i-2])</text>
+  <text x="10" y="330" class="code output">        return fib_sequence</text>
+  
+  <text x="10" y="360" class="code command"># Example usage:</text>
+  <text x="10" y="380" class="code command">n = 10</text>
+  <text x="10" y="400" class="code command">result = fibonacci(n)</text>
+</svg>

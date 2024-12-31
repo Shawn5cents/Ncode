@@ -83,6 +83,10 @@ Ncode aims to revolutionize local code generation by providing:
 ![Resource Dashboard](docs/assets/resource_dashboard.svg)
 *Real-time monitoring of system resources and performance metrics*
 
+#### Code Generation Example
+![Code Example](docs/assets/code_example.svg)
+*Example of Python code generation with Fibonacci sequence implementation*
+
 ### Known Issues
 - **Memory Leaks**: Occasional memory leaks during long sessions (fix in progress)
 - **Model Switching**: Some instability when switching between models
