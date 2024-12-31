@@ -40,9 +40,9 @@ Ncode aims to revolutionize local code generation by providing:
 ### Core Components
 - **Python 3.10+**: Primary programming language
 - **LLaMA Models**: Base models for code generation
-- **FastAPI**: Web interface and API endpoints
 - **PyTorch**: Model inference and GPU acceleration
 - **Pydantic**: Data validation and settings management
+- **aiohttp**: Async HTTP operations
 
 ### Key Libraries
 - **Transformers**: Model loading and inference
