@@ -113,4 +113,115 @@ We welcome contributions to help address these issues! Here's how you can help:
 - Check the [Contributing Guide](CONTRIBUTING.md) for more details
 - Open an issue if you need clarification on any aspect
 
-[Previous content continues...]
+## ✨ Features
+
+| Feature | Description | Benefits |
+|---------|-------------|-----------|
+| 🚄 **Multi-Token Prediction (MTP)** | Revolutionary parallel token generation | Up to 5x faster code generation |
+| 🔄 **Parallel Processing** | Simultaneous planning and implementation | Efficient workflow, better results |
+| 🎯 **GPU Acceleration** | Smart GPU layer optimization | Maximum performance on your hardware |
+| 🔧 **Model Flexibility** | Hot-swappable planning & coding models | Choose the right model for each task |
+| 🧠 **Multi-Head Latent Attention (MLA)** | Efficient attention mechanism | Reduced memory usage, faster inference |
+| 📊 **Resource Optimization** | Intelligent memory management | Smooth operation on any system |
+| 💡 **Mixture of Experts (MoE)** | Enhanced model with specialized sub-networks | Improved performance and efficiency |
+| 🖥️ **Enhanced Code Display** | Syntax highlighting and formatted output | Better code readability and review |
+| 📂 **Organized Code Storage** | Automatic file organization by date and project | Easy management of generated code |
+| 💾 **Code Saving** | Save generated code with proper naming and structure | Persistent storage of generated solutions |
+| 📝 **Code Summaries** | Generate code-focused summaries with examples | Better understanding and documentation of generated code |
+
+## 🛠️ Installation
+
+### General Steps
+1. Clone the repository:
+```bash
+git clone https://github.com/Shawn5cents/Ncode
+cd Ncode
+```
+
+2. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+### Platform-Specific Setup
+
+#### Windows
+1. Install Python 3.10+ from [python.org](https://www.python.org/downloads/windows/)
+2. Ensure Python is added to PATH during installation
+3. Open PowerShell and verify Python installation:
+```powershell
+python --version
+pip --version
+```
+4. Install build tools:
+```powershell
+pip install wheel
+```
+
+#### Linux
+1. Install Python 3.10+ using your package manager:
+```bash
+# Ubuntu/Debian
+sudo apt update
+sudo apt install python3.10 python3-pip
+
+# Fedora
+sudo dnf install python3.10 python3-pip
+```
+2. Verify installation:
+```bash
+python3 --version
+pip3 --version
+```
+3. Install development tools:
+```bash
+sudo apt install build-essential  # Ubuntu/Debian
+sudo dnf groupinstall "Development Tools"  # Fedora
+```
+
+#### iOS (via Pythonista or a-Shell)
+1. Install Pythonista from the App Store
+2. Clone repository using Git client in Pythonista
+3. Install dependencies:
+```python
+import os
+os.system('pip install -r requirements.txt')
+```
+Note: iOS has limited capabilities due to sandboxing. Consider using a remote server for full functionality.
+
+## 🚀 Usage
+
+Start generating code with our intuitive CLI:
+```bash
+python backend/cli_client.py
+```
+
+### 🎮 Commands
+
+| Command | Description |
+|---------|-------------|
+| `mtp` | 🚄 Toggle Multi-Token Prediction mode |
+| `models` | 📋 List available models |
+| `switch TYPE MODEL` | 🔄 Change active model (TYPE: planning\|coding) |
+| `attention TYPE MECHANISM [latent_dim] [cache]` | 🧠 Configure attention mechanism (MHA/MLA) |
+| `help` | 💡 Show help message |
+| `quit` | 👋 Exit program |
+| `moe TYPE ENABLED [num_experts] [capacity] [ratio]` | 🎛️ Configure Mixture of Experts |
+| `save` | 💾 Save generated code to file |
+| `summary [format]` | 📝 Generate summary (text, roadmap, flowchart) |
+| `code-summary` | 💻 Generate code-focused summary with examples |
+| `config` | ⚙️ Show current model configuration |
+
+## 👥 Contributing
+
+We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+## 📄 License
+
+MIT License - see [LICENSE](LICENSE) for details.
+
+---
+
+<div align="center">
+Made with ❤️ by the Ncode Team
+</div>
