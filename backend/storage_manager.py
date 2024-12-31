@@ -88,6 +88,44 @@ class StorageManager:
             
         return True
         
+    def _get_code_directory(self, filename: str) -> Path:
+        """Get the appropriate directory for storing generated code."""
+        # Create base directory structure
+        today = datetime.now().strftime("%Y-%m-%d")
+        project = "default"
+        
+        # Extract project name from filename if specified
+        if '_' in filename:
+            project = filename.split('_')[0]
+            
+        # Create directory path
+        code_dir = self.generated_code_dir / today / project
+        code_dir.mkdir(parents=True, exist_ok=True)
+        return code_dir
+
+    async def save_generated_code(self, filename: str, content: str) -> str:
+        """Save generated code with proper organization."""
+        try:
+            # Ensure filename has .py extension
+            if not filename.endswith('.py'):
+                filename += '.py'
+                
+            # Get appropriate directory
+            code_dir = self._get_code_directory(filename)
+            file_path = code_dir / filename
+            
+            # Save the content
+            await self._write_file(file_path, content)
+            
+            # Update metrics
+            self.metrics['generated_code'] = self.metrics.get('generated_code', 0) + 1
+            
+            return str(file_path)
+            
+        except Exception as e:
+            logger.error(f"Error saving generated code: {str(e)}")
+            raise
+
     async def create_backup(self) -> str:
         """Create a backup of all data asynchronously"""
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")

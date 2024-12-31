@@ -1,5 +1,83 @@
 # Changelog
 
+## [2.0.0] - YYYY-MM-DD
+
+### Major Changes
+- [Add major changes here]
+
+### Features
+- [Add new features here]
+
+### Fixes
+- [Add bug fixes here]
+
+### Breaking Changes
+- [List any breaking changes here]
+
+## [1.2.1] - 2024-12-30
+
+### Fixed
+- StopIteration handling in async token streaming
+- Ready state indicator in CLI after command completion
+- Error propagation in async futures chain
+
+### Improved
+- Multi-paragraph summary generation with continuation indicators
+- CLI command documentation for new features
+- Error handling documentation
+
+## [1.2.0] - 2024-07-18
+
+### Added
+- Code summary feature with `code-summary` command
+  - Generates code-focused summaries with examples
+  - Uses coding model for specialized output
+  - Includes syntax highlighting and code formatting
+  - Automatically saves as .py files when prompted
+
+## [1.1.1] - 2024-07-16
+
+### Added
+- Async content streaming with proper error handling
+- Enhanced model initialization with async verification
+- Improved test coverage for async operations
+- Better async cleanup handling in tests
+
+### Improved
+- Model client fixture in tests with proper mocking
+- Error handling for streaming operations
+- Async resource cleanup
+- Test structure and organization
+
+### Fixed
+- Context manager usage in streaming operations
+- Model verification in test environment
+- Async cleanup in test fixtures
+- Error handling in streaming tests
+
+## [1.1.0] - 2024-07-15
+
+### Added
+- Enhanced error handling with detailed context
+- Improved async/sync context handling
+- Comprehensive resource management system
+- GPU memory monitoring and optimization
+- Robust import handling with fallbacks
+
+### Improved
+- Error messages with detailed context information
+- Async warmup operations for better initialization
+- Model instance cleanup and resource management
+- GPU memory management with automatic cleanup
+- Import handling with graceful degradation
+
+### Fixed
+- Async/sync context issues in model loading
+- Resource leaks in model instances
+- GPU memory management during high usage
+- Import handling for optional features
+- Error recovery procedures
+
 ## [1.0.0] - 2023-12-27
 
 ### Added

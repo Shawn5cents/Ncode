@@ -88,6 +88,54 @@ class MCPIntegration:
                         },
                         "required": ["mode"]
                     }
+                ),
+                Tool(
+                    name="manage_connections",
+                    description="Manage MCP server connections",
+                    input_schema={
+                        "type": "object",
+                        "properties": {
+                            "action": {"type": "string", "enum": ["connect", "disconnect", "status"]},
+                            "server": {"type": "string"}
+                        },
+                        "required": ["action"]
+                    }
+                ),
+                Tool(
+                    name="monitor_usage",
+                    description="Monitor MCP tool usage statistics",
+                    input_schema={
+                        "type": "object",
+                        "properties": {
+                            "time_range": {"type": "string", "enum": ["day", "week", "month"]},
+                            "tool_name": {"type": "string"}
+                        }
+                    }
+                ),
+                Tool(
+                    name="validate_responses",
+                    description="Validate MCP tool responses",
+                    input_schema={
+                        "type": "object",
+                        "properties": {
+                            "tool_name": {"type": "string"},
+                            "response": {"type": "object"}
+                        },
+                        "required": ["tool_name", "response"]
+                    }
+                ),
+                Tool(
+                    name="manage_configurations",
+                    description="Manage MCP tool configurations",
+                    input_schema={
+                        "type": "object",
+                        "properties": {
+                            "action": {"type": "string", "enum": ["get", "set"]},
+                            "tool_name": {"type": "string"},
+                            "config": {"type": "object"}
+                        },
+                        "required": ["action"]
+                    }
                 )
             ]
             
@@ -159,3 +207,51 @@ class MCPIntegration:
         except Exception as e:
             logger.error(f"Cleanup error: {str(e)}")
             raise
+
+    async def manage_connections(self, action: str, server: Optional[str] = None) -> Dict:
+        """Manage MCP server connections"""
+        if not self.initialized:
+            await self.initialize()
+            
+        try:
+            args_key = str({"action": action, "server": server})
+            return await self._cached_tool_call("manage_connections", args_key)
+        except Exception as e:
+            logger.error(f"Connection management error: {str(e)}")
+            return None
+
+    async def monitor_usage(self, time_range: Optional[str] = None, tool_name: Optional[str] = None) -> Dict:
+        """Monitor MCP tool usage statistics"""
+        if not self.initialized:
+            await self.initialize()
+            
+        try:
+            args_key = str({"time_range": time_range, "tool_name": tool_name})
+            return await self._cached_tool_call("monitor_usage", args_key)
+        except Exception as e:
+            logger.error(f"Usage monitoring error: {str(e)}")
+            return None
+
+    async def validate_responses(self, tool_name: str, response: Dict) -> Dict:
+        """Validate MCP tool responses"""
+        if not self.initialized:
+            await self.initialize()
+            
+        try:
+            args_key = str({"tool_name": tool_name, "response": response})
+            return await self._cached_tool_call("validate_responses", args_key)
+        except Exception as e:
+            logger.error(f"Response validation error: {str(e)}")
+            return None
+
+    async def manage_configurations(self, action: str, tool_name: Optional[str] = None, config: Optional[Dict] = None) -> Dict:
+        """Manage MCP tool configurations"""
+        if not self.initialized:
+            await self.initialize()
+            
+        try:
+            args_key = str({"action": action, "tool_name": tool_name, "config": config})
+            return await self._cached_tool_call("manage_configurations", args_key)
+        except Exception as e:
+            logger.error(f"Configuration management error: {str(e)}")
+            return None

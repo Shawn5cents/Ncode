@@ -7,6 +7,7 @@ from threading import Lock
 
 import torch
 from llama_cpp import Llama
+from backend.experimental.mla_attention import MultiHeadLatentAttention
 from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn, TimeRemainingColumn
 from rich.live import Live
@@ -23,18 +24,40 @@ class LocalModelClient:
         self.models_dir = Path("models")
         self.available_models = {
             'planning': {
-                'default': "mistral-7b-instruct-v0.2.Q4_K_M.gguf",
+                'default': "wizardcoder-python-7b-v1.0.Q4_K_M.gguf",
                 'alternatives': [
-                    "llama-2-7b-chat.Q4_K_M.gguf",
-                    "mixtral-8x7b-instruct-v0.1.Q4_K_M.gguf"
-                ]
+                    "mistral-7b-instruct-v0.2.Q4_K_M.gguf",
+                    "codellama-7b-instruct.Q4_K_M.gguf"
+                ],
+                'attention': 'mha',  # Default to Multi-Head Attention
+                'mla_config': {
+                    'latent_dim': 64,
+                    'cache_enabled': True
+                },
+                'moe_config': {
+                    'enabled': False,
+                    'num_experts': 8,
+                    'expert_capacity': 64,
+                    'shared_expert_ratio': 0.25
+                }
             },
             'coding': {
-                'default': "codellama-7b-instruct.Q4_K_M.gguf",
+                'default': "deepseek-coder-6.7b-instruct-Q4_K_M.gguf",
                 'alternatives': [
-                    "codellama-13b-instruct.Q4_K_M.gguf",
-                    "deepseek-coder-6.7b-instruct.Q4_K_M.gguf"
-                ]
+                    "codellama-7b-instruct.Q4_K_M.gguf",
+                    "mistral-7b-instruct-v0.2.Q4_K_M.gguf"
+                ],
+                'attention': 'mha',  # Default to Multi-Head Attention
+                'mla_config': {
+                    'latent_dim': 64,
+                    'cache_enabled': True
+                },
+                'moe_config': {
+                    'enabled': False,
+                    'num_experts': 8,
+                    'expert_capacity': 64,
+                    'shared_expert_ratio': 0.25
+                }
             }
         }
         self.planner_model = self.available_models['planning']['default']
@@ -74,16 +97,10 @@ class LocalModelClient:
             gpu_mem_gb = self.gpu_memory / (1024 * 1024 * 1024)
             logger.info(f"GPU detected with {gpu_mem_gb:.1f}GB memory")
             
-            if gpu_mem_gb >= 24:
-                layers = 20
-            elif gpu_mem_gb >= 12:
-                layers = 15
-            elif gpu_mem_gb >= 6:
-                layers = 8
-            else:
-                layers = 4
+            # Minimal GPU layer allocation for 4GB VRAM
+            layers = 1
                 
-            logger.info(f"Using {layers} GPU layers")
+            logger.info(f"Using {layers} GPU layer (minimal allocation)")
             return layers
             
         except Exception as e:
@@ -104,14 +121,99 @@ class LocalModelClient:
                 try:
                     start_time = time.time()
                     model_path = str(self.models_dir / model_name)
+                    
+                    # Initialize loading errors
+                    self.loading_errors[model_name] = None
 
-                    if not Path(model_path).exists():
+                    model_file = Path(model_path)
+                    if not model_file.exists():
                         error_msg = f"Model file not found: {model_path}"
+                        self.loading_errors[model_name] = error_msg
+                        logger.error(error_msg)
+                        return
+                    elif model_file.stat().st_size == 0:
+                        error_msg = f"Model file is empty: {model_path}"
+                        self.loading_errors[model_name] = error_msg
+                        logger.error(error_msg)
+                        return
+
+                    # Verify model file integrity and compatibility
+                    try:
+                        with open(model_path, 'rb') as f:
+                            # Check GGUF header
+                            header = f.read(4)
+                            if header != b'gguf':
+                                error_msg = f"Invalid model file format: {model_path}"
+                                self.loading_errors[model_name] = error_msg
+                                logger.error(error_msg)
+                                return
+                            
+                            # Check file size is within expected ranges
+                            file_size = model_file.stat().st_size
+                            if file_size < 100 * 1024 * 1024:  # Less than 100MB
+                                error_msg = f"Model file is too small: {model_path} ({file_size / (1024 * 1024):.2f} MB)"
+                                self.loading_errors[model_name] = error_msg
+                                logger.error(error_msg)
+                                return
+                            elif file_size > 10 * 1024 * 1024 * 1024:  # More than 10GB
+                                error_msg = f"Model file is too large: {model_path} ({file_size / (1024 * 1024 * 1024):.2f} GB)"
+                                self.loading_errors[model_name] = error_msg
+                                logger.error(error_msg)
+                                return
+                            
+                            # Read version and architecture info
+                            f.seek(4)  # Skip GGUF header
+                            version = int.from_bytes(f.read(4), 'little')
+                            if version < 1 or version > 3:  # Supported GGUF versions
+                                error_msg = f"Unsupported GGUF version {version} in {model_path}"
+                                self.loading_errors[model_name] = error_msg
+                                logger.error(error_msg)
+                                return
+                            
+                            # Read architecture string length
+                            arch_len = int.from_bytes(f.read(4), 'little')
+                            if arch_len > 256:  # Sanity check
+                                error_msg = f"Invalid architecture string length in {model_path}"
+                                self.loading_errors[model_name] = error_msg
+                                logger.error(error_msg)
+                                return
+                            
+                            # Read architecture string
+                            architecture = f.read(arch_len).decode('utf-8')
+                            supported_archs = ['llama', 'mistral', 'deepseek']
+                            if not any(arch in architecture.lower() for arch in supported_archs):
+                                error_msg = f"Unsupported model architecture '{architecture}' in {model_path}"
+                                self.loading_errors[model_name] = error_msg
+                                logger.error(error_msg)
+                                return
+                            
+                            # Check quantization type
+                            f.seek(4 + 4 + 4 + arch_len)  # Skip to quantization type
+                            quant_type_len = int.from_bytes(f.read(4), 'little')
+                            if quant_type_len > 256:  # Sanity check
+                                error_msg = f"Invalid quantization type length in {model_path}"
+                                self.loading_errors[model_name] = error_msg
+                                logger.error(error_msg)
+                                return
+                            
+                            quant_type = f.read(quant_type_len).decode('utf-8')
+                            supported_quants = ['Q2_K', 'Q3_K', 'Q4_K', 'Q5_K', 'Q6_K', 'Q8_0']
+                            if not any(quant in quant_type for quant in supported_quants):
+                                error_msg = f"Unsupported quantization type '{quant_type}' in {model_path}"
+                                self.loading_errors[model_name] = error_msg
+                                logger.error(error_msg)
+                                return
+                            
+                            logger.info(f"Model validation passed: {model_path} (Arch: {architecture}, Quant: {quant_type}, Size: {file_size / (1024 * 1024):.2f} MB)")
+                            
+                    except Exception as e:
+                        error_msg = f"Error validating model file: {str(e)}"
                         self.loading_errors[model_name] = error_msg
                         logger.error(error_msg)
                         return
 
                     progress.update(task, advance=20, description="Initializing...")
+                    logger.info(f"Loading model from: {model_path} (Size: {model_file.stat().st_size / (1024 * 1024):.2f} MB)")
 
                     context_size = 8192
                     if self.gpu_available:
@@ -123,26 +225,80 @@ class LocalModelClient:
                     if self.gpu_available and gpu_mem_gb >= 12:
                         batch_size = 64
                     
-                    self.model_instances[model_name] = Llama(
-                        model_path=model_path,
-                        n_ctx=context_size,
-                        n_threads=min(os.cpu_count() or 4, 8),
-                        n_gpu_layers=self.n_gpu_layers,
-                        n_batch=batch_size,
-                        chat_format="llama-2",
-                        embedding=False,
-                        use_mlock=False,
-                        rope_scaling_type=1
-                    )
+                    # Initialize model with appropriate attention mechanism
+                    # Get available CPU RAM in GB
+                    import psutil
+                    cpu_ram_gb = psutil.virtual_memory().available / (1024 ** 3)
+                    
+                    # Calculate optimal thread count based on CPU cores and RAM
+                    cpu_cores = os.cpu_count() or 4
+                    max_threads = min(cpu_cores, 8)
+                    if cpu_ram_gb < 8:  # Less than 8GB RAM
+                        max_threads = min(cpu_cores, 4)
+                    elif cpu_ram_gb < 16:  # Less than 16GB RAM
+                        max_threads = min(cpu_cores, 6)
+                        
+                    # Adjust batch size based on available RAM
+                    if cpu_ram_gb < 8:
+                        batch_size = 16
+                    elif cpu_ram_gb < 16:
+                        batch_size = 24
+                    else:
+                        batch_size = 32
+                        
+                    model_config = {
+                        'model_path': model_path,
+                        'n_ctx': context_size,
+                        'n_threads': max_threads,
+                        'n_gpu_layers': self.n_gpu_layers,
+                        'n_batch': batch_size,
+                        'chat_format': "llama-2",
+                        'embedding': False,
+                        'use_mlock': True,  # Enable memory locking for better performance
+                        'rope_scaling_type': 1,
+                        'low_vram': cpu_ram_gb < 8  # Enable low VRAM mode if RAM is limited
+                    }
+                    
+                    # If MLA is enabled, configure attention
+                    model_type = 'planning' if model_name in self.available_models['planning']['alternatives'] + [self.available_models['planning']['default']] else 'coding'
+                    if self.available_models[model_type]['attention'] == 'mla':
+                        mla_config = self.available_models[model_type]['mla_config']
+                        model_config['attention'] = MultiHeadLatentAttention(
+                            embed_dim=4096,  # Default embedding dimension
+                            num_heads=8,     # Default number of attention heads
+                            latent_dim=mla_config['latent_dim'],
+                            max_seq_len=context_size
+                        )
+                        if mla_config['cache_enabled']:
+                            model_config['attention'].enable_cache()
+                    
+                    # If MoE is enabled, configure experts
+                    if self.available_models[model_type]['moe_config']['enabled']:
+                        moe_config = self.available_models[model_type]['moe_config']
+                        from backend.experimental.deepseek_moe import DeepSeekMoE
+                        model_config['moe'] = DeepSeekMoE(
+                            num_experts=moe_config['num_experts'],
+                            expert_capacity=moe_config['expert_capacity'],
+                            hidden_size=4096,  # Default hidden size
+                            shared_expert_ratio=moe_config['shared_expert_ratio']
+                        )
+                            
+                    try:
+                        self.model_instances[model_name] = Llama(**model_config)
+                        
+                        progress.update(task, advance=60)
+                        self.model_load_times[model_name] = time.time() - start_time
+                        self.models_loaded[model_name] = True
+                        self.loading_errors[model_name] = None
 
-                    progress.update(task, advance=60)
-                    self.model_load_times[model_name] = time.time() - start_time
-                    self.models_loaded[model_name] = True
-                    self.loading_errors[model_name] = None
-
-                    gpu_info = f" (GPU Layers: {self.n_gpu_layers})" if self.gpu_available else " (CPU)"
-                    progress.update(task, advance=20, description=f"Loaded {gpu_info}")
-                    logger.info(f"Loaded {model_name} in {self.model_load_times[model_name]:.2f}s {gpu_info}")
+                        gpu_info = f" (GPU Layers: {self.n_gpu_layers})" if self.gpu_available else " (CPU)"
+                        progress.update(task, advance=20, description=f"Loaded {gpu_info}")
+                        logger.info(f"Loaded {model_name} in {self.model_load_times[model_name]:.2f}s {gpu_info}")
+                    except Exception as e:
+                        error_msg = f"Failed to initialize model: {str(e)}"
+                        self.loading_errors[model_name] = error_msg
+                        logger.error(error_msg)
+                        raise
 
                 except Exception as e:
                     error_msg = str(e)
@@ -223,6 +379,71 @@ class LocalModelClient:
                     del self.models_loaded[model_name]
                 return True
         return False
+
+    def set_attention(self, model_type: str, attention_type: str, latent_dim: int = 64, cache_enabled: bool = True) -> bool:
+        """Change the attention mechanism for a model type."""
+        if model_type not in ['planning', 'coding']:
+            raise ValueError("Model type must be 'planning' or 'coding'")
+            
+        if attention_type not in ['mha', 'mla']:
+            raise ValueError("Attention type must be 'mha' or 'mla'")
+            
+        if self.available_models[model_type]['attention'] != attention_type:
+            self.available_models[model_type]['attention'] = attention_type
+            if attention_type == 'mla':
+                self.available_models[model_type]['mla_config'] = {
+                    'latent_dim': latent_dim,
+                    'cache_enabled': cache_enabled
+                }
+            # Reload model to apply new attention mechanism
+            if model_type == 'planning':
+                if self.planner_model in self.models_loaded:
+                    del self.models_loaded[self.planner_model]
+            else:
+                if self.coder_model in self.models_loaded:
+                    del self.models_loaded[self.coder_model]
+            return True
+        return False
+
+    def set_moe(self, model_type: str, enabled: bool, num_experts: int = 8, expert_capacity: int = 64, shared_expert_ratio: float = 0.25) -> bool:
+        """Configure Mixture of Experts settings for a model type."""
+        if model_type not in ['planning', 'coding']:
+            raise ValueError("Model type must be 'planning' or 'coding'")
+            
+        current_config = self.available_models[model_type]['moe_config']
+        if (current_config['enabled'] != enabled or
+            current_config['num_experts'] != num_experts or
+            current_config['expert_capacity'] != expert_capacity or
+            current_config['shared_expert_ratio'] != shared_expert_ratio):
+            
+            self.available_models[model_type]['moe_config'] = {
+                'enabled': enabled,
+                'num_experts': num_experts,
+                'expert_capacity': expert_capacity,
+                'shared_expert_ratio': shared_expert_ratio
+            }
+            
+            # Reload model to apply new MoE configuration
+            if model_type == 'planning':
+                if self.planner_model in self.models_loaded:
+                    del self.models_loaded[self.planner_model]
+            else:
+                if self.coder_model in self.models_loaded:
+                    del self.models_loaded[self.coder_model]
+            return True
+        return False
+
+    def get_attention_config(self, model_type: str) -> dict:
+        """Get the current attention configuration for a model type."""
+        if model_type not in ['planning', 'coding']:
+            raise ValueError("Model type must be 'planning' or 'coding'")
+            
+        config = {
+            'type': self.available_models[model_type]['attention']
+        }
+        if config['type'] == 'mla':
+            config.update(self.available_models[model_type]['mla_config'])
+        return config
 
     def list_available_models(self, model_type: str = None) -> dict:
         """List available models for planning and/or coding."""

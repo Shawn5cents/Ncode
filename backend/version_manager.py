@@ -20,6 +20,11 @@ class ModelVersion:
     training_samples: int
     metrics: Dict
     status: str
+    attention_config: Optional[Dict] = None
+    moe_config: Optional[Dict] = None
+    moe_utilization: Optional[Dict] = None
+    sub_expert_utilization: Optional[Dict] = None
+    aux_loss_history: Optional[List[float]] = None
 
 class VersionManager:
     def __init__(self):
@@ -122,15 +127,104 @@ class VersionManager:
             
             # Validate each version
             required_keys = {"name", "base_model", "created_at", "training_samples", "metrics", "status"}
+            optional_keys = {"attention_config", "moe_config", "moe_utilization"}
             for version in data["versions"]:
                 if not all(key in version for key in required_keys):
                     return False
+                
+                # Validate MoE configuration if present
+                if "moe_config" in version:
+                    if not self._validate_moe_config(version["moe_config"]):
+                        return False
+                
+                # Validate MoE utilization if present
+                if "moe_utilization" in version:
+                    if not self._validate_moe_utilization(version["moe_utilization"]):
+                        return False
+                
                 self._validation_cache.add(version["name"])
                 
             return True
             
         except Exception:
             return False
+
+    def _validate_moe_config(self, config: Dict) -> bool:
+        """Validate MoE configuration structure with enhanced checks"""
+        required_keys = {
+            "num_experts": (int, lambda x: x > 0),
+            "expert_capacity": (int, lambda x: x > 0),
+            "routing_strategy": (str, lambda x: x in {"top_k", "random", "learned"}),
+            "num_sub_experts": (int, lambda x: x > 0),
+            "sub_expert_capacity": (int, lambda x: x > 0)
+        }
+        optional_keys = {
+            "noise_std": (float, lambda x: x >= 0),
+            "load_balancing_weight": (float, lambda x: 0 <= x <= 1),
+            "expert_dropout": (float, lambda x: 0 <= x <= 1),
+            "aux_loss_weight": (float, lambda x: 0 <= x <= 1),
+            "shared_expert_ratio": (float, lambda x: 0 <= x <= 1)
+        }
+        
+        if not isinstance(config, dict):
+            return False
+            
+        # Validate required keys
+        for key, (type_check, validator) in required_keys.items():
+            if key not in config:
+                return False
+            if not isinstance(config[key], type_check) or not validator(config[key]):
+                return False
+                
+        # Validate optional keys
+        for key, (type_check, validator) in optional_keys.items():
+            if key in config and (not isinstance(config[key], type_check) or not validator(config[key])):
+                return False
+                
+        # Additional validation for top_k routing
+        if config["routing_strategy"] == "top_k":
+            if "k_value" not in config:
+                return False
+            if not isinstance(config["k_value"], int) or config["k_value"] <= 0:
+                return False
+            
+        # Validate sub-expert capacity is less than expert capacity
+        if config["sub_expert_capacity"] > config["expert_capacity"]:
+            return False
+            
+        # Validate shared expert ratio
+        if "shared_expert_ratio" in config and not (0 <= config["shared_expert_ratio"] <= 1):
+            return False
+            
+        return True
+
+    def _validate_moe_utilization(self, utilization: Dict) -> bool:
+        """Validate MoE utilization metrics with enhanced checks"""
+        required_keys = {
+            "total_tokens": (int, lambda x: x >= 0),
+            "expert_usage": (dict, lambda x: all(isinstance(k, str) and isinstance(v, float) for k, v in x.items())),
+            "load_balance": (float, lambda x: 0 <= x <= 1),
+            "expert_utilization": (dict, lambda x: all(isinstance(k, str) and isinstance(v, float) for k, v in x.items())),
+            "sub_expert_usage": (dict, lambda x: all(isinstance(k, str) and isinstance(v, float) for k, v in x.items())),
+            "sub_expert_utilization": (dict, lambda x: all(isinstance(k, str) and isinstance(v, float) for k, v in x.items())),
+            "aux_loss_history": (list, lambda x: all(isinstance(v, float) for v in x))
+        }
+        
+        if not isinstance(utilization, dict):
+            return False
+            
+        # Validate required keys
+        for key, (type_check, validator) in required_keys.items():
+            if key not in utilization:
+                return False
+            if not isinstance(utilization[key], type_check) or not validator(utilization[key]):
+                return False
+                
+        # Additional validation for expert usage percentages
+        if not all(0 <= v <= 1 for v in utilization["expert_usage"].values()):
+            return False
+            
+        return True
 
     async def register_version(self, model_type: str, version: ModelVersion) -> bool:
         """Register a new model version with optimized processing"""
@@ -182,6 +276,76 @@ class VersionManager:
             
         except Exception as e:
             logger.error(f"Failed to get current version: {str(e)}")
+            return None
+
+    async def compare_moe_configs(self, version1: str, version2: str, model_type: str) -> Optional[Dict]:
+        """Compare MoE configurations between two versions with detailed analysis"""
+        try:
+            versions_data = await self._get_versions(model_type)
+            
+            # Find both versions
+            v1_data = next((v for v in versions_data["versions"] if v["name"] == version1), None)
+            v2_data = next((v for v in versions_data["versions"] if v["name"] == version2), None)
+            
+            if not v1_data or not v2_data:
+                return None
+                
+            # Get MoE configs
+            moe1 = v1_data.get("moe_config", {})
+            moe2 = v2_data.get("moe_config", {})
+            
+            # Compare configurations with detailed analysis
+            comparison = {
+                "num_experts": {
+                    "version1": moe1.get("num_experts"),
+                    "version2": moe2.get("num_experts"),
+                    "changed": moe1.get("num_experts") != moe2.get("num_experts"),
+                    "impact": "Changes model capacity and computational requirements"
+                },
+                "expert_capacity": {
+                    "version1": moe1.get("expert_capacity"),
+                    "version2": moe2.get("expert_capacity"),
+                    "changed": moe1.get("expert_capacity") != moe2.get("expert_capacity"),
+                    "impact": "Affects memory usage and batch processing"
+                },
+                "routing_strategy": {
+                    "version1": moe1.get("routing_strategy"),
+                    "version2": moe2.get("routing_strategy"),
+                    "changed": moe1.get("routing_strategy") != moe2.get("routing_strategy"),
+                    "impact": "Changes how tokens are assigned to experts"
+                },
+                "expert_utilization": {
+                    "version1": v1_data.get("moe_utilization", {}).get("expert_utilization", {}),
+                    "version2": v2_data.get("moe_utilization", {}).get("expert_utilization", {}),
+                    "changed": v1_data.get("moe_utilization", {}).get("expert_utilization", {}) != 
+                              v2_data.get("moe_utilization", {}).get("expert_utilization", {}),
+                    "impact": "Shows how effectively experts are being used"
+                },
+                "sub_expert_utilization": {
+                    "version1": v1_data.get("moe_utilization", {}).get("sub_expert_utilization", {}),
+                    "version2": v2_data.get("moe_utilization", {}).get("sub_expert_utilization", {}),
+                    "changed": v1_data.get("moe_utilization", {}).get("sub_expert_utilization", {}) != 
+                              v2_data.get("moe_utilization", {}).get("sub_expert_utilization", {}),
+                    "impact": "Shows how effectively sub-experts are being used"
+                },
+                "aux_loss_history": {
+                    "version1": v1_data.get("moe_utilization", {}).get("aux_loss_history", []),
+                    "version2": v2_data.get("moe_utilization", {}).get("aux_loss_history", []),
+                    "changed": v1_data.get("moe_utilization", {}).get("aux_loss_history", []) != 
+                              v2_data.get("moe_utilization", {}).get("aux_loss_history", []),
+                    "impact": "Shows the auxiliary loss trend over time"
+                }
+            }
+            
+            # Calculate overall similarity score
+            total_fields = len(comparison)
+            changed_fields = sum(1 for field in comparison.values() if field["changed"])
+            comparison["similarity_score"] = 1 - (changed_fields / total_fields)
+            
+            return comparison
+            
+        except Exception as e:
+            logger.error(f"Failed to compare MoE configs: {str(e)}")
             return None
             
     async def rollback_version(self, model_type: str) -> Optional[ModelVersion]:
