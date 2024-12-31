@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="800" height="400" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .code { font-family: monospace; font-size: 14px; }
+    .output { fill: #4CAF50; }
+    .error { fill: #F44336; }
+    .warning { fill: #FFC107; }
+    .prompt { fill: #2196F3; }
+    .command { fill: #FFF; }
+  </style>
+  <rect width="100%" height="100%" fill="#1E1E1E"/>
+  <text x="10" y="30" class="code prompt">ncode&gt;</text>
+  <text x="70" y="30" class="code command">generate complex_algorithm.py</text>
+  
+  <text x="10" y="60" class="code error">[!] GPU Memory Warning: Approaching limit</text>
+  <text x="10" y="80" class="code warning">    • Initiating automatic recovery</text>
+  <text x="10" y="100" class="code output">    • Cleaning unused cache</text>
+  <text x="10" y="120" class="code output">    • Optimizing layer distribution</text>
+  <text x="10" y="140" class="code output">    • Adjusting batch size</text>
+  
+  <text x="10" y="180" class="code output">[✓] Recovery successful</text>
+  <text x="10" y="200" class="code output">    • Memory usage optimized</text>
+  <text x="10" y="220" class="code output">    • GPU layers: 24 → 16</text>
+  <text x="10" y="240" class="code output">    • Cache size adjusted</text>
+  
+  <text x="10" y="280" class="code output">[✓] Resuming generation</text>
+  <text x="10" y="300" class="code output">    • Using optimized configuration</text>
+  <text x="10" y="320" class="code output">    • Performance impact: minimal</text>
+</svg>

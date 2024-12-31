@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="800" height="400" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .code { font-family: monospace; font-size: 14px; }
+    .output { fill: #4CAF50; }
+    .header { fill: #2196F3; }
+    .stats { fill: #FFF; }
+    .good { fill: #4CAF50; }
+    .warning { fill: #FFC107; }
+  </style>
+  <rect width="100%" height="100%" fill="#1E1E1E"/>
+  
+  <text x="10" y="30" class="code header">=== Resource Dashboard (v2.0.0) ===</text>
+  
+  <text x="10" y="70" class="code header">GPU Memory Usage:</text>
+  <text x="30" y="90" class="code stats">Total: 8.0 GB</text>
+  <text x="30" y="110" class="code good">Used: 4.2 GB (52.5%)</text>
+  <text x="30" y="130" class="code stats">Reserved: 1.0 GB</text>
+  <text x="30" y="150" class="code good">Available: 2.8 GB</text>
+  
+  <text x="10" y="190" class="code header">Model Distribution:</text>
+  <text x="30" y="210" class="code stats">Planning Model: 2.1 GB</text>
+  <text x="30" y="230" class="code stats">Coding Model: 2.0 GB</text>
+  <text x="30" y="250" class="code stats">Shared Cache: 0.1 GB</text>
+  
+  <text x="10" y="290" class="code header">Performance Metrics:</text>
+  <text x="30" y="310" class="code good">Generation Speed: 140 tokens/s</text>
+  <text x="30" y="330" class="code good">Cache Hit Rate: 85%</text>
+  <text x="30" y="350" class="code warning">Memory Fragmentation: 12%</text>
+</svg>

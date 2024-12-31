@@ -72,13 +72,16 @@ Ncode aims to revolutionize local code generation by providing:
 ### Screenshots
 
 #### New Attention Mechanism Configuration
-![MLA Configuration](docs/assets/mla_config.png) *Placeholder for MLA config screenshot*
+![MLA Configuration](docs/assets/mla_config.svg)
+*Example of the new MLA configuration with improved memory usage and inference speed*
 
 #### Improved Error Handling
-![Error Recovery](docs/assets/error_recovery.png) *Placeholder for error recovery screenshot*
+![Error Recovery](docs/assets/error_recovery.svg)
+*Demonstration of automatic error recovery and resource optimization*
 
 #### Resource Optimization Dashboard
-![Resource Dashboard](docs/assets/resource_dashboard.png) *Placeholder for resource dashboard screenshot*
+![Resource Dashboard](docs/assets/resource_dashboard.svg)
+*Real-time monitoring of system resources and performance metrics*
 
 ### Known Issues
 - **Memory Leaks**: Occasional memory leaks during long sessions (fix in progress)

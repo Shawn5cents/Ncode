@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="800" height="400" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .code { font-family: monospace; font-size: 14px; }
+    .output { fill: #4CAF50; }
+    .prompt { fill: #2196F3; }
+    .command { fill: #FFF; }
+  </style>
+  <rect width="100%" height="100%" fill="#1E1E1E"/>
+  <text x="10" y="30" class="code prompt">ncode&gt;</text>
+  <text x="70" y="30" class="code command">attention planning mla 128 true</text>
+  <text x="10" y="60" class="code output">[✓] Switched planning model to MLA</text>
+  <text x="10" y="80" class="code output">    • Latent dimension: 128</text>
+  <text x="10" y="100" class="code output">    • Cache enabled: true</text>
+  <text x="10" y="120" class="code output">    • Memory usage: -35%</text>
+  <text x="10" y="140" class="code output">    • Inference speed: +40%</text>
+  
+  <text x="10" y="180" class="code prompt">ncode&gt;</text>
+  <text x="70" y="180" class="code command">config</text>
+  <text x="10" y="210" class="code output">[System Configuration]</text>
+  <text x="10" y="230" class="code output">Planning Model:</text>
+  <text x="10" y="250" class="code output">  • Model: mistral-7b-instruct-v0.2</text>
+  <text x="10" y="270" class="code output">  • Attention: MLA (latent_dim=128)</text>
+  <text x="10" y="290" class="code output">  • Cache: Enabled</text>
+  <text x="10" y="310" class="code output">  • GPU Layers: 32</text>
+  <text x="10" y="330" class="code output">  • Memory Usage: 4.2GB</text>
+</svg>
